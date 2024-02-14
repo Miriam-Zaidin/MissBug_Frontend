@@ -1,7 +1,8 @@
 export const utilService = {
     makeId,
     makeLorem,
-    getRandomIntInclusive
+    getRandomIntInclusive,
+    debounce
 }
 
 function makeId(length = 6) {
@@ -29,4 +30,38 @@ function getRandomIntInclusive(min, max) {
     min = Math.ceil(min)
     max = Math.floor(max)
     return Math.floor(Math.random() * (max - min + 1)) + min //The maximum is inclusive and the minimum is inclusive 
+}
+
+// debounce calls a function when a user has not carried
+// out an event in a specific amount of time
+function debounce(fn, delay) {
+    // Declare a variable called 'timer' to store the timer ID
+    let timer;
+
+    // Return an anonymous function that takes in any number of arguments
+    return function (...args) {
+        // Clear the previous timer to prevent the execution of 'mainFunction'
+        clearTimeout(timer);
+
+        // Set a new timer that will execute 'mainFunction' after the specified delay
+        timer = setTimeout(() => {
+            fn(...args);
+        }, delay);
+    };
+};
+
+
+// throttle() calls a function at intervals of a specified time
+// while the user is carrying out an event
+function throttle(fn, wait) {
+    let throttled = false
+    return function (...args) {
+        if (!throttled) {
+            fn.apply(this, args)
+            throttled = true
+            setTimeout(() => {
+                throttled = false
+            }, wait)
+        }
+    }
 }

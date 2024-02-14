@@ -9,49 +9,43 @@ const BASE_URL = '//localhost:3030/api/bug/'
 export const bugService = {
     query,
     getById,
-    save,
     remove,
-	getDefaultFilter
+    save,
+    getDefaultFilter
 }
 
-
-
 async function query(filterBy = {}) {
-    var { data: bugs } = await axios.get(BASE_URL)
-
-	if (filterBy.txt) {
-		const regExp = new RegExp(filterBy.txt, 'i')
-		bugs = bugs.filter(bug => regExp.test(bug.title+bug.description))
-	}
-    
-	if (filterBy.severity) {
-		bugs = bugs.filter(bug => bug.severity == filterBy.severity)
-	}
-	return bugs
+    // const queryParams =
+    //     `?txt=${filterBy.txt}&minSpeed=${filterBy.minSpeed}&pageIdx=${filterBy.pageIdx}`
+    var { data: bugs } = await axios.get(BASE_URL, { params: filterBy })
+    return bugs
 }
 
 async function getById(bugId) {
     const url = BASE_URL + bugId
-    
+
     var { data: bug } = await axios.get(url)
+    console.log(bug);
     return bug
 }
 
 async function remove(bugId) {
-    const url = BASE_URL + bugId + '/remove'
-    var { data: res } = await axios.get(url)
+    const url = BASE_URL + bugId
+    var { data: res } = await axios.delete(url)
     return res
 }
 
 async function save(bug) {
-    const queryParams = 
-        `?_id=${bug._id || ''}&title=${bug.title}&severity=${bug.severity}&description=${bug.description}&createdAt=${bug.createdAt}`
-    const url = BASE_URL + 'save' + queryParams 
+    // const queryParams =
+    // 	`?_id=${bug._id || ''}&vendor=${bug.vendor}&speed=${bug.speed}`
+    // const url = BASE_URL + 'save' + queryParams
 
-    const { data: savedbug } = await axios.get(url)
-    return savedbug
+
+    const method = bug._id ? 'put' : 'post'
+    const { data: savedBug } = await axios[method](BASE_URL, bug)
+    return savedBug
 }
 
 function getDefaultFilter() {
-	return { txt: '', severity: '' }
+    return { txt: '', severity: '', pageIdx: undefined }
 }
